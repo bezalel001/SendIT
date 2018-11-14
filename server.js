@@ -5,16 +5,15 @@ import userController from './controllers/user';
 import parcelController from './controllers/parcel';
 
 
-const PORT = 3000;
-
 const app = express();
 app.set('json spaces', 4);
-app.use(bodyParser.json({ type: 'application/json' }));
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const PORT = 3000;
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to sendIt application' });
+  res.json({ message: 'Welcome to sendit!' });
 });
 
 // create user account
@@ -27,14 +26,21 @@ app.post('/auth/login', (req, res) => {
   userController.login(req, res);
 });
 
+// create parcel
 app.post('/api/v1/parcels', (req, res) => {
   parcelController.create(req, res);
-  
-// get all parcels in the app
+});
+
+// get all parcel delivery orders
 app.get('/api/v1/parcels', (req, res) => {
   parcelController.getParcels(req, res);
 });
 
+// get a specific parcel delivery order
+app.get('/api/v1/parcels/:parcelId', (req, res) => {
+  parcelController.getParcel(req, res);
+});
+
 app.listen(PORT, () => {
-  console.log(`App is running on Port -- ${PORT}`);
+  console.log(`App is running on Port -- ${PORT} `);
 });
