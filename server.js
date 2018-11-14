@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 
 import userController from './controllers/user';
+import parcelController from './controllers/parcel';
 
 
 const PORT = 3000;
@@ -25,6 +26,10 @@ app.post('/auth/signup', (req, res) => {
 // login user
 app.post('/auth/login', (req, res) => {
   userController.login(req, res);
+});
+
+app.post('/api/v1/parcels', (req, res) => {
+  parcelController.create(req, res);
 });
 
 app.listen(PORT, () => {
