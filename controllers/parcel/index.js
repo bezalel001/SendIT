@@ -25,6 +25,17 @@ const parcelController = {
       return res.status(400).json({ error: error.message, message: 'coul not create parcel order' });
     }
   },
+
+  // Get all parcels in the app
+  async getParcels(req, res) {
+    const queryText = 'SELECT * FROM parcel_order';
+    try {
+      const { rows } = await querySendItDb(queryText);
+      return res.status(200).json({ rows });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+ 
 };
 
 export default parcelController;
