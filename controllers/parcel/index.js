@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { read } from 'fs';
 import querySendItDb from '../db';
 
 const parcelController = {
@@ -35,7 +36,25 @@ const parcelController = {
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
- 
+  },
+
+  // Get a specific parcel delivery order
+  async getParcel(req, res) {
+    const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1';
+
+    const values = [
+      req.params.parcelId,
+    ];
+    try {
+      const { rows } = await querySendItDb(queryText, values);
+      if (!rows[0]) {
+        return read.status(404).json({ message: 'Parcel delivery order not found' });
+      }
+      return res.status(200).json({ parcel: rows[0] });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+  },
 };
 
 export default parcelController;
