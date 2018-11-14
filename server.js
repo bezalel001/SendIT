@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 
 import userController from './controllers/user';
+import parcelController from './controllers/parcel';
 
 
 const PORT = 3000;
@@ -17,7 +18,6 @@ app.get('/', (req, res) => {
 });
 
 // create user account
-
 app.post('/auth/signup', (req, res) => {
   userController.create(req, res);
 });
@@ -25,6 +25,11 @@ app.post('/auth/signup', (req, res) => {
 // login user
 app.post('/auth/login', (req, res) => {
   userController.login(req, res);
+});
+
+// get all parcels in the app
+app.get('/api/v1/parcels', (req, res) => {
+  parcelController.getParcels(req, res);
 });
 
 app.listen(PORT, () => {
