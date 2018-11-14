@@ -87,6 +87,30 @@ const dropTables = () => {
 };
 
 
+// add missing status column to  parcel_order
+const addMissingColumn = () => {
+  const query = 'ALTER TABLE parcel_order ADD COLUMN status VARCHAR (32)';
+  poolQuery(query);
+};
+// update previous data
+const updateStatusData1 = () => {
+  const query1 = "UPDATE parcel_order SET status = 'placed' WHERE parcel_id = 1";
+
+
+  poolQuery(query1);
+};
+// update previous data
+const updateStatusData2 = () => {
+  const query2 = "UPDATE parcel_order SET status = 'transiting' WHERE parcel_id = 2";
+  poolQuery(query2);
+};
+
+// add not null constraint
+const addConstraintToNewColumn = () => {
+  const query = 'ALTER TABLE parcel_order ALTER COLUMN status SET NOT NULL';
+  poolQuery(query);
+};
+
 module.exports = {
   createUserTable,
   createParcelTable,
@@ -94,6 +118,10 @@ module.exports = {
   dropUserTable,
   dropParcelTable,
   dropTables,
+  addMissingColumn,
+  updateStatusData1,
+  updateStatusData2,
+  addConstraintToNewColumn,
 };
 
 require('make-runnable');
