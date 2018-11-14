@@ -27,6 +27,9 @@ app.post('/auth/login', (req, res) => {
   userController.login(req, res);
 });
 
+app.post('/api/v1/parcels', (req, res) => {
+  parcelController.create(req, res);
+  
 // get all parcels in the app
 app.get('/api/v1/parcels', (req, res) => {
   parcelController.getParcels(req, res);

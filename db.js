@@ -58,7 +58,7 @@ const createParcelTable = () => {
       receiver TEXT NOT NULL,
       current_location TEXT NOT NULL,
       sent_on TIMESTAMP NOT NULL,
-      delivered_on TIMESTAMP NOT NULL,
+      delivered_on TIMESTAMP NOT NULL, 
       FOREIGN KEY (placed_by) REFERENCES user_account (user_id) ON DELETE CASCADE
       )`;
 
