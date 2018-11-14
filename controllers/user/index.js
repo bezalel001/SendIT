@@ -46,6 +46,35 @@ const userController = {
     }
   },
 
+  // login user
+  async login(req, res) {
+    console.log('Req.body: ', req.body);
+    console.log('Email: ', req.body.email);
+    console.log('Password: ', req.body.password);
+    if (!req.body.email) {
+      return res.status(400).json({ message: 'Missing email' });
+    }
+    if (!req.body.password) {
+      return res.status(400).json({ message: 'Password missing!' });
+    }
+    // check if email is valid
+    const queryText = 'SELECT * FROM user_account WHERE email = $1';
+
+    try {
+      const { rows } = await querySendItDb(queryText, [req.body.email]);
+      if (!rows[0]) {
+        return res.status(400).json({ message: 'No account with the email you provided!' });
+      }
+      // compare password:TODO hash and compare
+      if (rows[0].password !== req.body.password) {
+        return res.status(400).json({ message: 'Invalid password' });
+      }
+      // TODO: generrate token
+      return res.status(200).json({ messsage: 'Login successful' });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+  },
 
 };
 

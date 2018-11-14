@@ -16,8 +16,15 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to sendIt application' });
 });
 
+// create user account
+
 app.post('/auth/signup', (req, res) => {
   userController.create(req, res);
+});
+
+// login user
+app.post('/auth/login', (req, res) => {
+  userController.login(req, res);
 });
 
 app.listen(PORT, () => {
