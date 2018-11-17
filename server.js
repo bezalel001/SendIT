@@ -41,6 +41,11 @@ app.get('/api/v1/parcels/:parcelId', (req, res) => {
   parcelController.getParcel(req, res);
 });
 
+// Cancel a specific parcel delivery order
+app.patch('/api/v1/parcels/:parcelId/cancel', (req, res) => {
+  parcelController.cancelParcel(req, res);
+});
+
 app.listen(PORT, () => {
   console.log(`App is running on Port -- ${PORT} `);
 });
