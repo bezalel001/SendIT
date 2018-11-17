@@ -52,8 +52,21 @@ app.patch('/api/v1/parcels/:parcelId/destination', (req, res) => {
 });
 
 // Fetch all parcel delivery order by a specific user
+// Only the user that created the order is allowed to access this endpoint
 app.get('/api/v1/users/:userId/parcels', (req, res) => {
   parcelController.getParcelsBySpecificUser(req, res);
+});
+
+// Change the status of a specific parcel delivery order.
+// Only the Admin is allowed to access this endpoint.
+app.patch('/api/v1/parcels/:parcelId/status', (req, res) => {
+  parcelController.changeParcelStatus(req, res);
+});
+
+// Change the present location of a specific parcel delivery order.
+// Only the Admin is allowed to access this endpoint.
+app.patch('/api/v1/parcels/:parcelId/currentLocation', (req, res) => {
+  parcelController.changeParcelCurrentLocation(req, res);
 });
 
 app.listen(PORT, () => {
