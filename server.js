@@ -46,6 +46,16 @@ app.patch('/api/v1/parcels/:parcelId/cancel', (req, res) => {
   parcelController.cancelParcel(req, res);
 });
 
+// Change the destination of a specific parcel delivery order.
+app.patch('/api/v1/parcels/:parcelId/destination', (req, res) => {
+  parcelController.changeParcelDestination(req, res);
+});
+
+// Fetch all parcel delivery order by a specific user
+app.get('/api/v1/users/:userId/parcels', (req, res) => {
+  parcelController.getParcelsBySpecificUser(req, res);
+});
+
 app.listen(PORT, () => {
   console.log(`App is running on Port -- ${PORT} `);
 });
