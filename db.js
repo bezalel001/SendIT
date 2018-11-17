@@ -111,6 +111,31 @@ const addConstraintToNewColumn = () => {
   poolQuery(query);
 };
 
+// add active column to parcel database
+const addActiveColumn = () => {
+  const query = 'ALTER TABLE parcel_order ADD COLUMN active BOOLEAN';
+  poolQuery(query);
+};
+// update previous data
+const updateActiveData1 = () => {
+  const query1 = 'UPDATE parcel_order SET active = true WHERE parcel_id = 4';
+
+
+  poolQuery(query1);
+};
+// update previous data
+const updateActiveData2 = () => {
+  const query2 = 'UPDATE parcel_order SET active = true WHERE parcel_id = 5';
+  poolQuery(query2);
+};
+
+// add not null constraint
+const addConstraintToActiveColumn = () => {
+  const query = 'ALTER TABLE parcel_order ALTER COLUMN active SET NOT NULL ';
+  poolQuery(query);
+};
+
+
 module.exports = {
   createUserTable,
   createParcelTable,
@@ -122,6 +147,10 @@ module.exports = {
   updateStatusData1,
   updateStatusData2,
   addConstraintToNewColumn,
+  addActiveColumn,
+  updateActiveData1,
+  updateActiveData2,
+  addConstraintToActiveColumn,
 };
 
 require('make-runnable');
