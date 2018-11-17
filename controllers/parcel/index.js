@@ -74,8 +74,49 @@ const parcelController = {
       }
 
       const response = await querySendItDb(patchQuery, [req.body.active, req.params.parcelId]);
-      console.log('Patch: ', response);
-      return res.status(200).json({ id: response.rows[0].parcelId, message: 'Order canceled' });
+
+      return res.status(200).json({ id: response.rows[0].parcel_id, message: 'Order canceled' });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+  },
+
+  // Change the destination of a specific parcel delivery order.
+  async changeParcelDestination(req, res) {
+    const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2 AND status != $3';
+    const patchQuery = 'UPDATE parcel_order SET receiver = $1 WHERE parcel_id = $2 returning *';
+    const values = [
+      req.params.parcelId,
+      true,
+      'delivered',
+    ];
+
+    try {
+      const { rows } = await querySendItDb(queryText, values);
+      if (!rows[0]) {
+        return res.status(401).json({ message: 'Change of destination not allowed!' });
+      }
+
+      const response = await querySendItDb(patchQuery, [req.body.receiver, req.params.parcelId]);
+
+      return res.status(200).json({ id: response.rows[0].parcel_id, to: response.rows[0].receiver, message: 'Parcel destination updated' });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+  },
+
+  // Fetch all parcel delivery order by a specific user.
+  async getParcelsBySpecificUser(req, res) {
+    const queryText = 'SELECT * FROM parcel_order WHERE placed_by = $1 AND active = true';
+    const values = [
+      req.params.userId,
+    ];
+    try {
+      const { rows } = await querySendItDb(queryText, values);
+      if (!rows[0]) {
+        return res.status(404).json({ message: 'There is no active parcel for this user' });
+      }
+      return res.status(200).json({ rows });
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
