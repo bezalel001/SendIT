@@ -121,6 +121,54 @@ const parcelController = {
       return res.status(400).json({ error: error.message });
     }
   },
+
+  // Change the status of a specific parcel delivery order.
+  // Only the Admin is allowed to access this endpoint.
+  async changeParcelStatus(req, res) {
+    const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2';
+    const patchQuery = 'UPDATE parcel_order SET status = $1 WHERE parcel_id = $2 returning *';
+    const values = [
+      req.params.parcelId,
+      true,
+    ];
+
+    try {
+      const { rows } = await querySendItDb(queryText, values);
+      if (!rows[0]) {
+        return res.status(404).json({ message: 'Parcel delivery order not dound' });
+      }
+
+      const response = await querySendItDb(patchQuery, [req.body.status, req.params.parcelId]);
+
+      return res.status(200).json({ id: response.rows[0].parcel_id, to: response.rows[0].status, message: 'Parcel status updated' });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+  },
+
+  // Change the present location of a specific parcel delivery order.
+  // Only the Admin is allowed to access this endpoint.
+  async changeParcelCurrentLocation(req, res) {
+    const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2';
+    const patchQuery = 'UPDATE parcel_order SET current_location = $1 WHERE parcel_id = $2 returning *';
+    const values = [
+      req.params.parcelId,
+      true,
+    ];
+
+    try {
+      const { rows } = await querySendItDb(queryText, values);
+      if (!rows[0]) {
+        return res.status(404).json({ message: 'Parcel delivery order not dound' });
+      }
+
+      const response = await querySendItDb(patchQuery, [req.body.currentLocation, req.params.parcelId]);
+
+      return res.status(200).json({ id: response.rows[0].parcel_id, to: response.rows[0].current_location, message: 'Parcel location updated' });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+  },
 };
 
 export default parcelController;
