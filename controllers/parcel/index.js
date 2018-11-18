@@ -30,6 +30,9 @@ const parcelController = {
   // Get all parcels in the app
   async getParcels(req, res) {
     const queryText = 'SELECT * FROM parcel_order WHERE active = true';
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Unauthorized access' });
+    }
     try {
       const { rows } = await querySendItDb(queryText);
       return res.status(200).json({ rows });
@@ -96,7 +99,11 @@ const parcelController = {
     try {
       const { rows } = await querySendItDb(queryText, values);
       if (!rows[0]) {
-        return res.status(401).json({ message: 'Change of destination not allowed!' });
+        return res.status(403).json({ message: 'Change of destination not allowed!' });
+      }
+      // confirm that the logged in user actually created this parcel delivery order
+      if (rows[0].placed_by !== req.user.userId) {
+        return res.status(403).json({ message: 'Operation not allowed. Unauthorised access!' });
       }
 
       const response = await querySendItDb(patchQuery, [req.body.receiver, req.params.parcelId]);
@@ -109,6 +116,10 @@ const parcelController = {
 
   // Fetch all parcel delivery order by a specific user.
   async getParcelsBySpecificUser(req, res) {
+    // confirm that the logged in user created the parcel orders
+    if (req.params.userId !== req.user.userId) {
+      return res.status(403).json({ message: 'Unauthorized access' });
+    }
     const queryText = 'SELECT * FROM parcel_order WHERE placed_by = $1 AND active = true';
     const values = [
       req.params.userId,
@@ -127,6 +138,9 @@ const parcelController = {
   // Change the status of a specific parcel delivery order.
   // Only the Admin is allowed to access this endpoint.
   async changeParcelStatus(req, res) {
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Operation not allowed. Unauthorised access!' });
+    }
     const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2';
     const patchQuery = 'UPDATE parcel_order SET status = $1 WHERE parcel_id = $2 returning *';
     const values = [
@@ -151,6 +165,9 @@ const parcelController = {
   // Change the present location of a specific parcel delivery order.
   // Only the Admin is allowed to access this endpoint.
   async changeParcelCurrentLocation(req, res) {
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Operation not allowed. Unauthorised access!' });
+    }
     const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2';
     const patchQuery = 'UPDATE parcel_order SET current_location = $1 WHERE parcel_id = $2 returning *';
     const values = [

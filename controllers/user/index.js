@@ -77,8 +77,10 @@ const userController = {
       // TODO: generrate token
       const payload = {
         id: rows[0].user_id,
+        isAdmin: rows[0].is_admin,
       };
       console.log('Payload id: ', rows[0].user_id);
+      console.log('Payload id: ', rows[0].is_admin);
       const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '5d' });
 
       return res.status(200).json({ token, messsage: 'Login successful' });
@@ -109,7 +111,7 @@ const userController = {
       if (!rows[0]) {
         return res.status(404).json({ messaage: 'User with token not found' });
       }
-      req.user = { userId: token.id };
+      req.user = { userId: token.id, isAdmin: token.isAdmin };
       console.log('req.user.userId: ', req.user.userId);
       return next();
     } catch (error) {
