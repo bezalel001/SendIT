@@ -3,13 +3,13 @@ import querySendItDb from '../db';
 
 const parcelController = {
 
-  // create parcel
+  // Create parcel delivery order
   async create(req, res) {
     const queryText = `
       INSERT INTO parcel_order(placed_by, weight, weight_metric, sender, receiver, current_location, sent_on)
       VALUES($1, $2, $3, $4, $5, $6, $7) returning *`;
     const values = [
-      req.user.userId, // to be replaced with req.user.id
+      req.user.userId,
       req.body.weight,
       req.body.weightMetric,
       req.body.sender,
@@ -140,7 +140,7 @@ const parcelController = {
       }
       return res.status(200).json({ status: res.statusCode, data: rows });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ status: res.statusCode, error: error.message });
     }
   },
 
@@ -168,7 +168,7 @@ const parcelController = {
       return res.status(200).json({
         status: res.statusCode,
         id: response.rows[0].parcel_id,
-        to: response.rows[0].status,
+        currentStatus: response.rows[0].status,
         message: 'Parcel status updated',
       });
     } catch (error) {
@@ -200,7 +200,7 @@ const parcelController = {
       return res.status(200).json({
         status: res.statusCode,
         id: response.rows[0].parcel_id,
-        to: response.rows[0].current_location,
+        currentLocation: response.rows[0].current_location,
         message: 'Parcel location updated',
       });
     } catch (error) {
