@@ -135,6 +135,25 @@ const addConstraintToActiveColumn = () => {
   poolQuery(query);
 };
 
+// increase varchar size for table column
+const increaseVarSize = () => {
+  const query = 'ALTER TABLE user_account ALTER COLUMN password TYPE VARCHAR(255)';
+  poolQuery(query);
+};
+
+// remove constraint from column
+const removeContraintFromCoulmn = () => {
+  const query = 'ALTER TABLE parcel_order ALTER COLUMN delivered_on DROP NOT NULL';
+  poolQuery(query);
+};
+
+
+// set colum default value
+const setColumnDefault = () => {
+  const query = "ALTER TABLE parcel_order ALTER COLUMN status SET DEFAULT 'placed' ";
+  poolQuery(query);
+};
+
 
 module.exports = {
   createUserTable,
@@ -151,6 +170,9 @@ module.exports = {
   updateActiveData1,
   updateActiveData2,
   addConstraintToActiveColumn,
+  increaseVarSize,
+  removeContraintFromCoulmn,
+  setColumnDefault,
 };
 
 require('make-runnable');

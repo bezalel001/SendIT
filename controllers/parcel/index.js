@@ -6,8 +6,8 @@ const parcelController = {
   // create parcel
   async create(req, res) {
     const queryText = `
-      INSERT INTO parcel_order(placed_by, weight, weight_metric, sender, receiver, current_location, sent_on, delivered_on, status)
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) returning *`;
+      INSERT INTO parcel_order(placed_by, weight, weight_metric, sender, receiver, current_location, sent_on)
+      VALUES($1, $2, $3, $4, $5, $6, $7) returning *`;
     const values = [
       req.user.userId, // to be replaced with req.user.id
       req.body.weight,
@@ -15,49 +15,49 @@ const parcelController = {
       req.body.sender,
       req.body.receiver,
       req.body.currentLocation,
-      req.body.sentOn,
-      req.body.deliveredOn,
-      req.body.status,
+      moment((new Date())),
     ];
     try {
       const { rows } = await querySendItDb(queryText, values);
-      return res.status(201).json({ Message: 'parcel created' });
+      return res.status(201).json({ status: res.statusCode, data: rows[0], Message: 'parcel created' });
     } catch (error) {
-      return res.status(400).json({ error: error.message, message: 'coul not create parcel order' });
+      return res.status(400).json({ status: res.statusCode, error: error.message, message: 'Could not create parcel order' });
     }
   },
 
   // Get all parcels in the app
   async getParcels(req, res) {
-    const queryText = 'SELECT * FROM parcel_order WHERE active = true';
     if (!req.user.isAdmin) {
-      return res.status(403).json({ message: 'Unauthorized access' });
+      return res.status(403).json({ status: res.statusCode, message: 'Unauthorized access' });
     }
+    const queryText = 'SELECT * FROM parcel_order WHERE active = true';
     try {
       const { rows } = await querySendItDb(queryText);
-      return res.status(200).json({ rows });
+      return res.status(200).json({ status: res.statusCode, data: rows });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ status: res.statusCode, error: error.message });
     }
   },
 
   // Get a specific parcel delivery order
   async getParcel(req, res) {
-    const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2 AND placed_by = $3';
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ status: res.statusCode, message: 'Unauthorized access' });
+    }
+    const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND placed_by = $3';
 
     const values = [
       req.params.parcelId,
-      true,
       req.user.userId,
     ];
     try {
       const { rows } = await querySendItDb(queryText, values);
       if (!rows[0]) {
-        return res.status(404).json({ message: 'Parcel delivery order not found' });
+        return res.status(404).json({ status: res.statusCode, message: 'Parcel delivery order not found' });
       }
-      return res.status(200).json({ parcel: rows[0] });
+      return res.status(200).json({ status: res.statusCode, data: rows[0] });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ status: res.statusCode, error: error.message });
     }
   },
 
@@ -77,12 +77,16 @@ const parcelController = {
       if (!rows[0]) {
         return res.status(404).json({ message: 'Parcel delivery order not found' });
       }
+      // confirm that the logged in user actually created this parcel delivery order
+      if (rows[0].placed_by !== req.user.userId) {
+        return res.status(403).json({ status: res.statusCode, message: 'Operation prohibited!Unauthorised access!' });
+      }
 
       const response = await querySendItDb(patchQuery, [req.body.active, req.params.parcelId, req.user.userId]);
 
-      return res.status(200).json({ id: response.rows[0].parcel_id, message: 'Order canceled' });
+      return res.status(200).json({ status: res.statusCode, id: response.rows[0].parcel_id, message: 'Order canceled' });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ status: res.statusCode, error: error.message });
     }
   },
 
@@ -99,18 +103,23 @@ const parcelController = {
     try {
       const { rows } = await querySendItDb(queryText, values);
       if (!rows[0]) {
-        return res.status(403).json({ message: 'Change of destination not allowed!' });
+        return res.status(403).json({ status: res.statusCode, message: 'Change of destination not allowed!Unauthorised access!' });
       }
       // confirm that the logged in user actually created this parcel delivery order
       if (rows[0].placed_by !== req.user.userId) {
-        return res.status(403).json({ message: 'Operation not allowed. Unauthorised access!' });
+        return res.status(403).json({ status: res.statusCode, message: 'Operation not allowed. Unauthorised access!' });
       }
 
       const response = await querySendItDb(patchQuery, [req.body.receiver, req.params.parcelId]);
 
-      return res.status(200).json({ id: response.rows[0].parcel_id, to: response.rows[0].receiver, message: 'Parcel destination updated' });
+      return res.status(200).json({
+        status: res.statusCode,
+        id: response.rows[0].parcel_id,
+        to: response.rows[0].receiver,
+        message: 'Parcel destination updated',
+      });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ status: res.statusCode, error: error.message });
     }
   },
 
@@ -118,18 +127,18 @@ const parcelController = {
   async getParcelsBySpecificUser(req, res) {
     // confirm that the logged in user created the parcel orders
     if (req.params.userId !== req.user.userId) {
-      return res.status(403).json({ message: 'Unauthorized access' });
+      return res.status(403).json({ status: res.statusCode, message: 'Unauthorized access' });
     }
-    const queryText = 'SELECT * FROM parcel_order WHERE placed_by = $1 AND active = true';
+    const queryText = 'SELECT * FROM parcel_order WHERE placed_by = $1';
     const values = [
       req.params.userId,
     ];
     try {
       const { rows } = await querySendItDb(queryText, values);
       if (!rows[0]) {
-        return res.status(404).json({ message: 'There is no active parcel for this user' });
+        return res.status(404).json({ status: res.statusCode, message: 'There is no parcel for this user' });
       }
-      return res.status(200).json({ rows });
+      return res.status(200).json({ status: res.statusCode, data: rows });
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
@@ -139,7 +148,7 @@ const parcelController = {
   // Only the Admin is allowed to access this endpoint.
   async changeParcelStatus(req, res) {
     if (!req.user.isAdmin) {
-      return res.status(403).json({ message: 'Operation not allowed. Unauthorised access!' });
+      return res.status(403).json({ status: res.statusCode, message: 'Operation not allowed. Unauthorised access!' });
     }
     const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2';
     const patchQuery = 'UPDATE parcel_order SET status = $1 WHERE parcel_id = $2 returning *';
@@ -151,14 +160,19 @@ const parcelController = {
     try {
       const { rows } = await querySendItDb(queryText, values);
       if (!rows[0]) {
-        return res.status(404).json({ message: 'Parcel delivery order not dound' });
+        return res.status(404).json({ status: res.statusCode, message: 'Parcel delivery order not dound' });
       }
 
       const response = await querySendItDb(patchQuery, [req.body.status, req.params.parcelId]);
 
-      return res.status(200).json({ id: response.rows[0].parcel_id, to: response.rows[0].status, message: 'Parcel status updated' });
+      return res.status(200).json({
+        status: res.statusCode,
+        id: response.rows[0].parcel_id,
+        to: response.rows[0].status,
+        message: 'Parcel status updated',
+      });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ status: res.statusCode, error: error.message });
     }
   },
 
@@ -178,14 +192,19 @@ const parcelController = {
     try {
       const { rows } = await querySendItDb(queryText, values);
       if (!rows[0]) {
-        return res.status(404).json({ message: 'Parcel delivery order not dound' });
+        return res.status(404).json({ status: res.statusCode, message: 'Parcel delivery order not found' });
       }
 
       const response = await querySendItDb(patchQuery, [req.body.currentLocation, req.params.parcelId]);
 
-      return res.status(200).json({ id: response.rows[0].parcel_id, to: response.rows[0].current_location, message: 'Parcel location updated' });
+      return res.status(200).json({
+        status: res.statusCode,
+        id: response.rows[0].parcel_id,
+        to: response.rows[0].current_location,
+        message: 'Parcel location updated',
+      });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ status: res.statusCode, error: error.message });
     }
   },
 };
