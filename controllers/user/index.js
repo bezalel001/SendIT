@@ -1,5 +1,10 @@
 import moment from 'moment';
+import jwt from 'jsonwebtoken';
+
+import dotenv from 'dotenv';
 import querySendItDb from '../db';
+
+dotenv.config();
 
 const userController = {
 
@@ -70,9 +75,45 @@ const userController = {
         return res.status(400).json({ message: 'Invalid password' });
       }
       // TODO: generrate token
-      return res.status(200).json({ messsage: 'Login successful' });
+      const payload = {
+        id: rows[0].user_id,
+      };
+      console.log('Payload id: ', rows[0].user_id);
+      const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '5d' });
+
+      return res.status(200).json({ token, messsage: 'Login successful' });
     } catch (error) {
       return res.status(400).json({ error: error.message });
+    }
+  },
+
+  async verifyToken(req, res, next) {
+    let userToken = req.headers['x-access-token'] || req.headers.authorization;
+    if (!userToken) {
+      return res.status(401).json({ message: 'Authorization failed!' });
+    }
+    if (userToken.startsWith('Bearer ')) {
+      userToken = userToken.slice(7, userToken.length);
+    }
+
+    try {
+      console.log(' Before Verify token: ', userToken);
+      const token = await jwt.verify(userToken, process.env.JWT_SECRET_KEY);
+      console.log('After Verify token: ', token);
+      if (!token) {
+        return res.status(400).json({ messaage: 'Could not verify token' });
+      }
+
+      const queryText = 'SELECT * FROM user_account WHERE user_id = $1';
+      const { rows } = await querySendItDb(queryText, [token.id]);
+      if (!rows[0]) {
+        return res.status(404).json({ messaage: 'User with token not found' });
+      }
+      req.user = { userId: token.id };
+      console.log('req.user.userId: ', req.user.userId);
+      return next();
+    } catch (error) {
+      return res.status(400).json({ error });
     }
   },
 

@@ -27,47 +27,48 @@ app.post('/auth/login', (req, res) => {
 });
 
 // create parcel
-app.post('/api/v1/parcels', (req, res) => {
+app.post('/api/v1/parcels', userController.verifyToken, (req, res) => {
   parcelController.create(req, res);
 });
 
 // get all parcel delivery orders
-app.get('/api/v1/parcels', (req, res) => {
+app.get('/api/v1/parcels', userController.verifyToken, (req, res) => {
   parcelController.getParcels(req, res);
 });
 
 // get a specific parcel delivery order
-app.get('/api/v1/parcels/:parcelId', (req, res) => {
+app.get('/api/v1/parcels/:parcelId', userController.verifyToken, (req, res) => {
   parcelController.getParcel(req, res);
 });
 
 // Cancel a specific parcel delivery order
-app.patch('/api/v1/parcels/:parcelId/cancel', (req, res) => {
+app.patch('/api/v1/parcels/:parcelId/cancel', userController.verifyToken, (req, res) => {
   parcelController.cancelParcel(req, res);
 });
 
 // Change the destination of a specific parcel delivery order.
-app.patch('/api/v1/parcels/:parcelId/destination', (req, res) => {
+app.patch('/api/v1/parcels/:parcelId/destination', userController.verifyToken, (req, res) => {
   parcelController.changeParcelDestination(req, res);
 });
 
 // Fetch all parcel delivery order by a specific user
 // Only the user that created the order is allowed to access this endpoint
-app.get('/api/v1/users/:userId/parcels', (req, res) => {
+app.get('/api/v1/users/:userId/parcels', userController.verifyToken, (req, res) => {
   parcelController.getParcelsBySpecificUser(req, res);
 });
 
 // Change the status of a specific parcel delivery order.
 // Only the Admin is allowed to access this endpoint.
-app.patch('/api/v1/parcels/:parcelId/status', (req, res) => {
+app.patch('/api/v1/parcels/:parcelId/status', userController.verifyToken, (req, res) => {
   parcelController.changeParcelStatus(req, res);
 });
 
 // Change the present location of a specific parcel delivery order.
 // Only the Admin is allowed to access this endpoint.
-app.patch('/api/v1/parcels/:parcelId/currentLocation', (req, res) => {
+app.patch('/api/v1/parcels/:parcelId/currentLocation', userController.verifyToken, (req, res) => {
   parcelController.changeParcelCurrentLocation(req, res);
 });
+
 
 app.listen(PORT, () => {
   console.log(`App is running on Port -- ${PORT} `);

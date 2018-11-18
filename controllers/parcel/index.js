@@ -9,7 +9,7 @@ const parcelController = {
       INSERT INTO parcel_order(placed_by, weight, weight_metric, sender, receiver, current_location, sent_on, delivered_on, status)
       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) returning *`;
     const values = [
-      req.body.placedBy, // to be replaced with req.user.id
+      req.user.userId, // to be replaced with req.user.id
       req.body.weight,
       req.body.weightMetric,
       req.body.sender,
@@ -40,11 +40,12 @@ const parcelController = {
 
   // Get a specific parcel delivery order
   async getParcel(req, res) {
-    const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2';
+    const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2 AND placed_by = $3';
 
     const values = [
       req.params.parcelId,
       true,
+      req.user.userId,
     ];
     try {
       const { rows } = await querySendItDb(queryText, values);
@@ -59,12 +60,13 @@ const parcelController = {
 
   // Cancel a specific parcel delivery order
   async cancelParcel(req, res) {
-    const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2 AND status != $3';
-    const patchQuery = 'UPDATE parcel_order SET active = $1 WHERE parcel_id = $2 returning *';
+    const queryText = 'SELECT * FROM parcel_order WHERE parcel_id = $1 AND active = $2 AND status != $3 AND placed_by = $4';
+    const patchQuery = 'UPDATE parcel_order SET active = $1 WHERE parcel_id = $2 AND placed_by = $3 returning *';
     const values = [
       req.params.parcelId,
       true,
       'delivered',
+      req.user.userId,
     ];
 
     try {
@@ -73,7 +75,7 @@ const parcelController = {
         return res.status(404).json({ message: 'Parcel delivery order not found' });
       }
 
-      const response = await querySendItDb(patchQuery, [req.body.active, req.params.parcelId]);
+      const response = await querySendItDb(patchQuery, [req.body.active, req.params.parcelId, req.user.userId]);
 
       return res.status(200).json({ id: response.rows[0].parcel_id, message: 'Order canceled' });
     } catch (error) {
