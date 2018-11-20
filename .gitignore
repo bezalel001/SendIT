@@ -1,0 +1,5 @@
+# Ignore folderr named `node-modules`
+node_modules/
+
+# Ignore file named `.env`
+.env
