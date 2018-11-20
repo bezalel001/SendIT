@@ -1,7 +1,10 @@
 import moment from 'moment';
 import querySendItDb from '../db';
+import transporter from '../user/email';
+
 
 const parcelController = {
+
 
   // Create parcel delivery order
   async create(req, res) {
@@ -165,6 +168,32 @@ const parcelController = {
 
       const response = await querySendItDb(patchQuery, [req.body.status, req.params.parcelId]);
 
+      // Send email notification to parcel owner
+      const findOwner = 'SELECT * FROM user_account WHERE user_id = $1';
+      const result = await querySendItDb(findOwner, [rows[0].placed_by]);
+
+      const statusNotification = `
+        <h2>Parcel Status Change</h2>
+        <p>Your parcel status has changed</p>
+        <p>Status: <strong>${req.body.status}</p>
+      `;
+      const mailOptions = {
+        from: process.env.EMAIL,
+        to: result.rows[0].email,
+        subject: 'Your Parcel Delivery Order Status',
+        html: statusNotification,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(`Could not send email: ${error}`);
+        } else {
+          console.log(`Email sent: ${info.response}`);
+        }
+      });
+      console.log('Sender: ', process.env.EMAIL);
+      console.log('Recipient: ', result.rows[0].email);
+
       return res.status(200).json({
         status: res.statusCode,
         id: response.rows[0].parcel_id,
@@ -197,11 +226,69 @@ const parcelController = {
 
       const response = await querySendItDb(patchQuery, [req.body.currentLocation, req.params.parcelId]);
 
+      // send email notification to parcel owner
+      const findOwner = 'SELECT * FROM user_account WHERE user_id = $1';
+      const result = await querySendItDb(findOwner, [rows[0].placed_by]);
+
+      const locationNotification = `
+      <h2>Parcel Location Change</h2>
+      <p>Your parcel location has changed</p>
+      <p>Current Location: <strong>${req.body.currentLocation}<></p>
+      `;
+      const mailOptions = {
+        from: process.env.EMAIL,
+        to: result.rows[0].email,
+        subject: 'Your Parcel Delivery Order Location',
+        html: locationNotification,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(`Could not send email: ${error}`);
+        } else {
+          console.log(`Email sent: ${info.response}`);
+        }
+      });
+      console.log('Sender: ', process.env.EMAIL);
+      console.log('Recipient: ', result.rows[0].email);
+
       return res.status(200).json({
         status: res.statusCode,
         id: response.rows[0].parcel_id,
         currentLocation: response.rows[0].current_location,
         message: 'Parcel location updated',
+      });
+    } catch (error) {
+      return res.status(400).json({ status: res.statusCode, error: error.message });
+    }
+  },
+
+  // delete a parcel delivery order
+  async deleteParcel(req, res) {
+    const findParcel = 'SELECT * FROM parcel_order WHERE parcel_id = $1';
+
+    try {
+      const { rows } = await querySendItDb(findParcel, [req.params.parcelId]);
+      if (!rows[0]) {
+        return res.status(404).json({ status: res.statusCode, message: 'Could not find parcel' });
+      }
+      // Ensure that the user who wants to delete this parcel is the owner
+      if (rows[0].placed_by !== req.user.userId) {
+        return res.status(403).json({ status: res.statusCode, message: 'Operation not allowed. Unauthorised access!' });
+      }
+      const delQueryText = 'DELETE FROM parcel_order WHERE parcel_id =$1';
+      const delResponse = await querySendItDb(delQueryText, [req.params.parcelId]);
+      if (!delResponse.rows[0]) {
+        return res.status(404).json({ status: res.statusCode, message: 'Parcel not found' });
+      }
+      const findOwner = 'SELECT * FROM user_account WHERE user_id = 1$';
+      const parcelOwner = await querySendItDb(findOwner, [delResponse.rows[0].placed_by]);
+      if (!parcelOwner.rows[0]) {
+        return res.status(400).json({ status: res.statusCode, messaage: 'Invalid request' });
+      }
+      return res.status(204).json({
+        status: res.statusCode,
+        messaage: `Parcel delivery order placed by: ${parcelOwner.rows[0].first_name} ${parcelOwner.rows[0].last_name} has been deleted`,
       });
     } catch (error) {
       return res.status(400).json({ status: res.statusCode, error: error.message });

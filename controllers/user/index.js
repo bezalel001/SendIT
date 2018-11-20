@@ -58,23 +58,24 @@ const userController = {
   // login user
   async login(req, res) {
     if (!req.body.email) {
-      return res.status(400).json({ status: res.statusCode, message: 'Missing email' });
+      return res.status(401).json({ status: res.statusCode, message: 'Missing email!' });
     }
     if (!req.body.password) {
-      return res.status(400).json({ status: res.statusCode, message: 'Password missing!' });
+      return res.status(401).json({ status: res.statusCode, message: 'Password missing!' });
     }
     // check if email is valid
     const queryText = 'SELECT * FROM user_account WHERE email = $1';
 
     try {
       const { rows } = await querySendItDb(queryText, [req.body.email]);
+
       if (!rows[0]) {
-        return res.status(400).json({ status: res.statusCode, message: 'No account with the email you provided!' });
+        return res.status(401).json({ status: res.statusCode, message: 'Email does not exist!' });
       }
       // compare password
       const match = await bcrypt.compare(req.body.password, rows[0].password);
-      if (match) {
-        return res.status(401).json({ status: res.statusCode, message: 'Invalid password' });
+      if (!match) {
+        return res.status(401).json({ status: res.statusCode, message: 'Invalid password!' });
       }
       // Generate token
       const payload = {
@@ -113,6 +114,26 @@ const userController = {
       return next();
     } catch (error) {
       return res.status(400).json({ status: res.statusCode, error });
+    }
+  },
+
+  // Delete a user
+  async delete(req, res) {
+    if (req.user.userId !== req.params.userId) {
+      return res.status(403).json({ status: res.statusCode, message: 'Operation not allowed. Unauthorised access!' });
+    }
+    const queryText = 'DELETE FROM user_account WHERE user_id=$1 returning *';
+    try {
+      const { rows } = await querySendItDb(queryText, [req.user.userId]);
+      if (!rows[0]) {
+        return res.status(404).json({ status: res.statusCode, message: 'User not found' });
+      }
+      return res.status(204).json({
+        status: res.statusCode,
+        messaage: `User account with name: ${rows[0].first_name} ${rows[0].last_name} has been deleted`,
+      });
+    } catch (error) {
+      return res.status(400).json({ status: res.statusCode, error: error.message });
     }
   },
 

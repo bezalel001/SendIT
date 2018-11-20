@@ -1,4 +1,5 @@
 import express from 'express';
+import 'babel-polyfill';
 import bodyParser from 'body-parser';
 
 import userController from './controllers/user';
@@ -24,6 +25,11 @@ app.post('/auth/signup', (req, res) => {
 // login user
 app.post('/auth/login', (req, res) => {
   userController.login(req, res);
+});
+
+// delete a user account
+app.delete('/api/v1/users/:userId', userController.verifyToken, (req, res) => {
+  userController.delete(req, res);
 });
 
 // create parcel
@@ -73,3 +79,5 @@ app.patch('/api/v1/parcels/:parcelId/currentLocation', userController.verifyToke
 app.listen(PORT, () => {
   console.log(`App is running on Port -- ${PORT} `);
 });
+
+export default app;
