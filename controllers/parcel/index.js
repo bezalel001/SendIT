@@ -7,7 +7,7 @@ const parcelController = {
 
 
   // Create parcel delivery order
-  async create(req, res) {
+  async createParcel(req, res) {
     const queryText = `
       INSERT INTO parcel_order(placed_by, weight, weight_metric, sender, receiver, current_location, sent_on)
       VALUES($1, $2, $3, $4, $5, $6, $7) returning *`;
