@@ -14,15 +14,15 @@ var _bodyParser = require('body-parser');
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
-var _auth = require('./controllers/auth');
+var _auth = require('../controllers/auth');
 
 var _auth2 = _interopRequireDefault(_auth);
 
-var _user = require('./controllers/user');
+var _user = require('../controllers/user');
 
 var _user2 = _interopRequireDefault(_user);
 
-var _parcel = require('./controllers/parcel');
+var _parcel = require('../controllers/parcel');
 
 var _parcel2 = _interopRequireDefault(_parcel);
 
@@ -30,10 +30,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var app = (0, _express2.default)();
 app.set('json spaces', 4);
+
+// app.use(express.static('public'));
 app.use(_bodyParser2.default.json());
 app.use(_bodyParser2.default.urlencoded({ extended: true }));
-
-app.use(_express2.default.static('public'));
 
 var PORT = 3000;
 

@@ -1,18 +1,18 @@
 import express from 'express';
 import 'babel-polyfill';
 import bodyParser from 'body-parser';
-
 import authController from './controllers/auth';
 import userController from './controllers/user';
 import parcelController from './controllers/parcel';
 
-
 const app = express();
 app.set('json spaces', 4);
+
+
+// app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static('public'));
 
 const PORT = 3000;
 
