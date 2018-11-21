@@ -4,8 +4,6 @@ node_js:
 cache: npm
 services:
   - postgresql
-before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
 env:
   global:
   - PGPORT=5433
