@@ -695,6 +695,21 @@ app.patch('/api/v1/parcels/:parcelId/currentLocation', authController.verifyToke
 });
 
 
+/**
+ * @api {delete} /api/v1/parcel/:parcelId Deletes a parcel order
+ * @apiGroup Parcel
+ * @apiHeader {String} Authorisation Token of authenticated user
+ * @apiHeaderExample {json}  Header
+ *   {"Authorisation": "Bearer thehre.hsdkj08.hjhkkr0"}
+ * @apiSuccessExample {json} Success
+ *   HTTP/1.1 204 No Content
+ * @apiErrorExample {json} Delete error
+ *   HTTP/1.1 412 Precondition Failed
+ */
+app.delete('/api/v1/parcels/:parcelId', authController.verifyToken, (req, res) => {
+  userController.delete(req, res);
+});
+
 app.listen(PORT, () => {
   console.log(`App is running on Port -- ${PORT} `);
 });
