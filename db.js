@@ -37,7 +37,7 @@ const createUserTable = () => {
       last_name varchar (32) NOT NULL,
       other_names VARCHAR (32),
       email VARCHAR (128) UNIQUE NOT NULL,
-      password VARCHAR (32) NOT NULL,
+      password VARCHAR (255) NOT NULL,
       username VARCHAR (32) UNIQUE NOT NULL,
       registered TIMESTAMP,
       is_admin BOOLEAN NOT NULL
@@ -52,13 +52,15 @@ const createParcelTable = () => {
   parcel_order(
       parcel_id serial PRIMARY KEY,
       placed_by INTEGER NOT NULL,
-      weight REAL NOT NULL,
-      weight_metric VARCHAR (16) NOT NULL,      
+      weight REAL,
+      weight_metric VARCHAR (32),      
       sender TEXT NOT NULL,
       receiver TEXT NOT NULL,
-      current_location TEXT NOT NULL,
+      current_location TEXT,
+      status VARCHAR (32),
+      active BOOLEAN NOT NULL DEFAULT true,
       sent_on TIMESTAMP NOT NULL,
-      delivered_on TIMESTAMP NOT NULL, 
+      delivered_on TIMESTAMP,
       FOREIGN KEY (placed_by) REFERENCES user_account (user_id) ON DELETE CASCADE
       )`;
 
@@ -72,86 +74,18 @@ const createTables = () => {
 
 // Drop tables
 const dropUserTable = () => {
-  const queryText = 'DROP TABLE IF EXISTS user returning *';
+  const queryText = 'DROP TABLE IF EXISTS user_account';
   poolQuery(queryText);
 };
 
 const dropParcelTable = () => {
-  const queryText = 'DROP TABLE IF EXISTS parcel returning *';
+  const queryText = 'DROP TABLE IF EXISTS parcel_order';
   poolQuery(queryText);
 };
 
 const dropTables = () => {
   dropUserTable();
   dropParcelTable();
-};
-
-
-// add missing status column to  parcel_order
-const addMissingColumn = () => {
-  const query = 'ALTER TABLE parcel_order ADD COLUMN status VARCHAR (32)';
-  poolQuery(query);
-};
-// update previous data
-const updateStatusData1 = () => {
-  const query1 = "UPDATE parcel_order SET status = 'placed' WHERE parcel_id = 1";
-
-
-  poolQuery(query1);
-};
-// update previous data
-const updateStatusData2 = () => {
-  const query2 = "UPDATE parcel_order SET status = 'transiting' WHERE parcel_id = 2";
-  poolQuery(query2);
-};
-
-// add not null constraint
-const addConstraintToNewColumn = () => {
-  const query = 'ALTER TABLE parcel_order ALTER COLUMN status SET NOT NULL';
-  poolQuery(query);
-};
-
-// add active column to parcel database
-const addActiveColumn = () => {
-  const query = 'ALTER TABLE parcel_order ADD COLUMN active BOOLEAN';
-  poolQuery(query);
-};
-// update previous data
-const updateActiveData1 = () => {
-  const query1 = 'UPDATE parcel_order SET active = true WHERE parcel_id = 4';
-
-
-  poolQuery(query1);
-};
-// update previous data
-const updateActiveData2 = () => {
-  const query2 = 'UPDATE parcel_order SET active = true WHERE parcel_id = 5';
-  poolQuery(query2);
-};
-
-// add not null constraint
-const addConstraintToActiveColumn = () => {
-  const query = 'ALTER TABLE parcel_order ALTER COLUMN active SET NOT NULL ';
-  poolQuery(query);
-};
-
-// increase varchar size for table column
-const increaseVarSize = () => {
-  const query = 'ALTER TABLE user_account ALTER COLUMN password TYPE VARCHAR(255)';
-  poolQuery(query);
-};
-
-// remove constraint from column
-const removeContraintFromCoulmn = () => {
-  const query = 'ALTER TABLE parcel_order ALTER COLUMN delivered_on DROP NOT NULL';
-  poolQuery(query);
-};
-
-
-// set colum default value
-const setColumnDefault = () => {
-  const query = "ALTER TABLE parcel_order ALTER COLUMN status SET DEFAULT 'placed' ";
-  poolQuery(query);
 };
 
 
@@ -162,17 +96,6 @@ module.exports = {
   dropUserTable,
   dropParcelTable,
   dropTables,
-  addMissingColumn,
-  updateStatusData1,
-  updateStatusData2,
-  addConstraintToNewColumn,
-  addActiveColumn,
-  updateActiveData1,
-  updateActiveData2,
-  addConstraintToActiveColumn,
-  increaseVarSize,
-  removeContraintFromCoulmn,
-  setColumnDefault,
 };
 
 require('make-runnable');
