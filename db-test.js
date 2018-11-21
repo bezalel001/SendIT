@@ -35,7 +35,7 @@ const createUserTable = () => {
       user_id serial PRIMARY KEY,
       first_name VARCHAR (32) NOT NULL,
       last_name varchar (32) NOT NULL,
-      other_names VARCHAR (32),
+      other_names VARCHAR (32), 
       email VARCHAR (128) UNIQUE NOT NULL,
       password VARCHAR (255) NOT NULL,
       username VARCHAR (32) UNIQUE NOT NULL,
