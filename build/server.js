@@ -1,20 +1,41 @@
-import express from 'express';
-import 'babel-polyfill';
-import bodyParser from 'body-parser';
-import authController from './controllers/auth';
-import userController from './controllers/user';
-import parcelController from './controllers/parcel';
+'use strict';
 
-const app = express();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _express = require('express');
+
+var _express2 = _interopRequireDefault(_express);
+
+require('babel-polyfill');
+
+var _bodyParser = require('body-parser');
+
+var _bodyParser2 = _interopRequireDefault(_bodyParser);
+
+var _auth = require('../controllers/auth');
+
+var _auth2 = _interopRequireDefault(_auth);
+
+var _user = require('../controllers/user');
+
+var _user2 = _interopRequireDefault(_user);
+
+var _parcel = require('../controllers/parcel');
+
+var _parcel2 = _interopRequireDefault(_parcel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var app = (0, _express2.default)();
 app.set('json spaces', 4);
 
-
 // app.use(express.static('public'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(_bodyParser2.default.json());
+app.use(_bodyParser2.default.urlencoded({ extended: true }));
 
-
-const PORT = 3000;
+var PORT = 3000;
 
 /**
  * @api {get} /API Status
@@ -24,7 +45,7 @@ const PORT = 3000;
  *      HTTP/1.1 200 OK
  *      {"message": "Welcome to sendit"}
  */
-app.get('/', (req, res) => {
+app.get('/', function (req, res) {
   res.json({ message: 'Welcome to sendit!' });
 });
 
@@ -72,8 +93,8 @@ app.get('/', (req, res) => {
  * @apiErrorExample {json} Sign up error
  *   HTTP/1.1 412 Precondition Failed
  */
-app.post('/auth/signup', (req, res) => {
-  authController.createUserAccount(req, res);
+app.post('/auth/signup', function (req, res) {
+  _auth2.default.createUserAccount(req, res);
 });
 
 /**
@@ -94,13 +115,13 @@ app.post('/auth/signup', (req, res) => {
  *   HTTP/1.1 401 Unauthorised
  *   {"message": "Invalid credentials"}
  */
-app.post('/auth/login', (req, res) => {
-  authController.login(req, res);
+app.post('/auth/login', function (req, res) {
+  _auth2.default.login(req, res);
 });
 
 // get all users
-app.get('/api/v1/users', (req, res) => {
-  userController.getUsers(req, res);
+app.get('/api/v1/users', function (req, res) {
+  _user2.default.getUsers(req, res);
 });
 
 /**
@@ -133,62 +154,60 @@ app.get('/api/v1/users', (req, res) => {
  * @apiErrorExample {json} Find error
  *   HTTP/1.1 404 Not Found
  */
-app.get('/api/v1/users/:userId', authController.verifyToken, (req, res) => {
-  userController.getUser(req, res);
+app.get('/api/v1/users/:userId', _auth2.default.verifyToken, function (req, res) {
+  _user2.default.getUser(req, res);
 });
 
-
 // delete a user account
-app.delete('/api/v1/users/:userId', authController.verifyToken, (req, res) => {
-  userController.delete(req, res);
+app.delete('/api/v1/users/:userId', _auth2.default.verifyToken, function (req, res) {
+  _user2.default.delete(req, res);
 });
 
 // create parcel
-app.post('/api/v1/parcels', authController.verifyToken, (req, res) => {
-  parcelController.createParcel(req, res);
+app.post('/api/v1/parcels', _auth2.default.verifyToken, function (req, res) {
+  _parcel2.default.createParcel(req, res);
 });
 
 // get all parcel delivery orders
-app.get('/api/v1/parcels', authController.verifyToken, (req, res) => {
-  parcelController.getParcels(req, res);
+app.get('/api/v1/parcels', _auth2.default.verifyToken, function (req, res) {
+  _parcel2.default.getParcels(req, res);
 });
 
 // get a specific parcel delivery order
-app.get('/api/v1/parcels/:parcelId', authController.verifyToken, (req, res) => {
-  parcelController.getParcel(req, res);
+app.get('/api/v1/parcels/:parcelId', _auth2.default.verifyToken, function (req, res) {
+  _parcel2.default.getParcel(req, res);
 });
 
 // Cancel a specific parcel delivery order
-app.patch('/api/v1/parcels/:parcelId/cancel', authController.verifyToken, (req, res) => {
-  parcelController.cancelParcel(req, res);
+app.patch('/api/v1/parcels/:parcelId/cancel', _auth2.default.verifyToken, function (req, res) {
+  _parcel2.default.cancelParcel(req, res);
 });
 
 // Change the destination of a specific parcel delivery order.
-app.patch('/api/v1/parcels/:parcelId/destination', authController.verifyToken, (req, res) => {
-  parcelController.changeParcelDestination(req, res);
+app.patch('/api/v1/parcels/:parcelId/destination', _auth2.default.verifyToken, function (req, res) {
+  _parcel2.default.changeParcelDestination(req, res);
 });
 
 // Fetch all parcel delivery order by a specific user
 // Only the user that created the order is allowed to access this endpoint
-app.get('/api/v1/users/:userId/parcels', authController.verifyToken, (req, res) => {
-  parcelController.getParcelsBySpecificUser(req, res);
+app.get('/api/v1/users/:userId/parcels', _auth2.default.verifyToken, function (req, res) {
+  _parcel2.default.getParcelsBySpecificUser(req, res);
 });
 
 // Change the status of a specific parcel delivery order.
 // Only the Admin is allowed to access this endpoint.
-app.patch('/api/v1/parcels/:parcelId/status', authController.verifyToken, (req, res) => {
-  parcelController.changeParcelStatus(req, res);
+app.patch('/api/v1/parcels/:parcelId/status', _auth2.default.verifyToken, function (req, res) {
+  _parcel2.default.changeParcelStatus(req, res);
 });
 
 // Change the present location of a specific parcel delivery order.
 // Only the Admin is allowed to access this endpoint.
-app.patch('/api/v1/parcels/:parcelId/currentLocation', authController.verifyToken, (req, res) => {
-  parcelController.changeParcelCurrentLocation(req, res);
+app.patch('/api/v1/parcels/:parcelId/currentLocation', _auth2.default.verifyToken, function (req, res) {
+  _parcel2.default.changeParcelCurrentLocation(req, res);
 });
 
-
-app.listen(PORT, () => {
-  console.log(`App is running on Port -- ${PORT} `);
+app.listen(PORT, function () {
+  console.log('App is running on Port -- ' + PORT + ' ');
 });
 
-export default app;
+exports.default = app;
