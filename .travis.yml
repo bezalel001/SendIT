@@ -5,14 +5,12 @@ cache: npm
 services:
   - postgresql
 before_script:
-  - psql -c 'createdb travis_ci_test;' -U postgres
+  - psql -c 'create database travis_ci_test;' -U postgres
 addons:
   postgresql: "11"
   apt:
     packages:
     - postgresql-11
-    - pg
-
 env:
   global:
   - PGPORT=5433
