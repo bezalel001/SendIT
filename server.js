@@ -187,6 +187,7 @@ app.get('/api/v1/users/:userId', authController.verifyToken, (req, res) => {
  * @apiHeader {String} Authorisation Token of authenticated user
  * @apiHeaderExample {json}  Header
  *   {"Authorisation": "Bearer thehre.hsdkj08.hjhkkr0"}
+ * @apiParam {Number} userId User id
  * @apiSuccessExample {json} Success
  *   HTTP/1.1 204 No Content
  * @apiErrorExample {json} Delete error
@@ -701,6 +702,7 @@ app.patch('/api/v1/parcels/:parcelId/currentLocation', authController.verifyToke
  * @apiHeader {String} Authorisation Token of authenticated user
  * @apiHeaderExample {json}  Header
  *   {"Authorisation": "Bearer thehre.hsdkj08.hjhkkr0"}
+ * @apiParam {Number} parcelId Parcel id
  * @apiSuccessExample {json} Success
  *   HTTP/1.1 204 No Content
  * @apiErrorExample {json} Delete error

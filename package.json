@@ -7,7 +7,8 @@
     "test": "mocha test/**/*.js || true",
     "start": "nodemon server.js --exec babel-node --presets env",
     "build": "babel server.js --out-dir build",
-    "apidoc": "apidoc -f server.js -o public/apidoc"
+    "apidoc": "apidoc -f server.js -o public/apidoc",
+    "coverage": "istanbul cover _mocha test/**/*.js"
   },
   "apidoc": {
     "name": "SendIT API - Documentation",
@@ -42,6 +43,7 @@
     "eslint": "^5.9.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
+    "istanbul": "^0.4.5",
     "make-runnable": "^1.3.6",
     "mocha": "^5.2.0",
     "supertest": "^3.3.0"
