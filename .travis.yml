@@ -6,11 +6,7 @@ services:
   - postgresql
 after_script:
   - psql -c 'create database travis_ci_test;' -U postgres
-addons:
-  postgresql: "11"
-  apt:
-    packages:
-    - postgresql-11
+
 env:
   global:
   - PGPORT=5433
