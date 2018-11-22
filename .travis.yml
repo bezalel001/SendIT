@@ -7,7 +7,7 @@ services:
 addons:
   postgresql: "9.5"
 before_script:
-  - psql -c 'create database travis_ci_test;' -U mikeogu -password misha007
+  - psql -c 'create database travis_ci_test;' -U mikeogu
 env:
   global:
   - DATABASE_URL = postgresql://mikeogu:misha007@localhost:5432/sendit_db
