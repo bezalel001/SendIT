@@ -1,0 +1,16 @@
+language: node_js
+node_js:
+   - "node"
+cache: npm
+services:
+  - postgresql
+addons:
+  postgresql: "9.5"
+before_script:
+  - psql -c 'create database travis_ci_test;' -U mikeogu
+env:
+  global:
+  - DATABASE_URL = postgresql://mikeogu:misha007@localhost:5432/sendit_db
+  - TEST_DATABASE_URL = postgresql://mikeogu:misha007@localhost:5432/sendit_test_db
+  - NODE_ENV = test
+
