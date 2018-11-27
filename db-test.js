@@ -9,7 +9,7 @@ const pool = new Pool({
 });
 
 pool.on('connect', () => {
-  console.log('Connected to sendit_test_db database!');
+  console.log('Connected to sendit_est_tdb database!');
 });
 
 pool.on('remove', () => {
@@ -35,7 +35,7 @@ const createUserTable = () => {
       user_id serial PRIMARY KEY,
       first_name VARCHAR (32) NOT NULL,
       last_name varchar (32) NOT NULL,
-      other_names VARCHAR (32),
+      other_names VARCHAR (32), 
       email VARCHAR (128) UNIQUE NOT NULL,
       password VARCHAR (255) NOT NULL,
       username VARCHAR (32) UNIQUE NOT NULL,
@@ -52,12 +52,12 @@ const createParcelTable = () => {
   parcel_order(
       parcel_id serial PRIMARY KEY,
       placed_by INTEGER NOT NULL,
-      weight REAL NOT NULL,
-      weight_metric VARCHAR (16) NOT NULL,      
+      weight REAL,
+      weight_metric VARCHAR (32),      
       sender TEXT NOT NULL,
       receiver TEXT NOT NULL,
-      current_location TEXT NOT NULL,
-      status VARCHAR (32) NOT NULL DEFAULT 'placed',
+      current_location TEXT,
+      status VARCHAR (32),
       active BOOLEAN NOT NULL DEFAULT true,
       sent_on TIMESTAMP NOT NULL,
       delivered_on TIMESTAMP,
@@ -74,12 +74,12 @@ const createTables = () => {
 
 // Drop tables
 const dropUserTable = () => {
-  const queryText = 'DROP TABLE IF EXISTS user returning *';
+  const queryText = 'DROP TABLE IF EXISTS user_account';
   poolQuery(queryText);
 };
 
 const dropParcelTable = () => {
-  const queryText = 'DROP TABLE IF EXISTS parcel returning *';
+  const queryText = 'DROP TABLE IF EXISTS parcel_order';
   poolQuery(queryText);
 };
 

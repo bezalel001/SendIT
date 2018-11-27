@@ -84,7 +84,12 @@ const authController = {
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '5d' });
 
-      return res.status(200).json({ status: res.statusCode, token, messsage: 'Login successful' });
+      return res.status(200).json({
+        status: res.statusCode,
+        data: rows[0],
+        token,
+        message: 'Login successful',
+      });
     } catch (error) {
       return res.status(400).json({ status: res.statusCode, error: error.message });
     }
@@ -116,7 +121,6 @@ const authController = {
       return res.status(400).json({ status: res.statusCode, error });
     }
   },
-
 
 };
 
