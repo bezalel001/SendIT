@@ -1,6 +1,7 @@
 import express from 'express';
 import 'babel-polyfill';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 import authController from './controllers/auth';
 import userController from './controllers/user';
@@ -11,6 +12,7 @@ const app = express();
 app.set('json spaces', 4);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 
 app.use(express.static('public'));
 
@@ -140,7 +142,7 @@ app.post('/auth/login', (req, res) => {
  * @apiErrorExample {json} Find error
  *   HTTP/1.1 404 Not Found
  */
-app.get('/api/v1/users', (req, res) => {
+app.get('/api/v1/users', authController.verifyToken, (req, res) => {
   userController.getUsers(req, res);
 });
 
@@ -247,17 +249,21 @@ app.post('/api/v1/parcels', authController.verifyToken, (req, res) => {
 });
 
 /**
- * @api {patch} /api/v1/parcels Activate and return a parcel delivery order
+ * @api {patch} /api/v1/users/:userId/parcels/:parcelId Activate and return a parcel delivery order
  * @apiGroup Parcel
  * @apiHeader {String} Authorisation Token of authenticated user
  * @apiHeaderExample {json}  Header
  *   {"Authorisation": "Bearer thehre.hsdkj08.hjhkkr0"}
+ * @apiParam {Number} parcelId Parcel ID
+ * @apiParam {Number} placed_by Parcel Owner Id
  * @apiParam {Number} weight Parcel weight
  * @apiParam {String} weightMetric Parcel weight unit of measurement
  * @apiParam {String} currentLocation Parcel current location
  * @apiParam {String} status Parcel current status (==='placed')
  * @apiParamExample {json} Input
  *   {
+ *     "parcelId": 1,
+ *     "placed_by": 2,
  *     "weight": 1.3,
  *     "weightMetric": "Kilogramme",
  *     "currentLocation": "MM Airport, Ikeja, Lagos",
@@ -443,7 +449,7 @@ app.patch('/api/v1/parcels/:parcelId/cancel', authController.verifyToken, (req, 
 });
 
 /**
- * @api {patch} /api/v1/parcels/:parcelId/cancel Change the destination of a specific parcel delivery order.
+ * @api {patch} /api/v1/parcels/:parcelId/destination Change the destination of a specific parcel delivery order.
  * @apiGroup Parcel
  * @apiHeader {String} Authorisation Token of authenticated user
  * @apiHeaderExample {json}  Header
@@ -595,7 +601,7 @@ app.get('/api/v1/users/:userId/parcels', authController.verifyToken, (req, res) 
 
 
 /**
- * @api {patch} /api/v1/parcels/:parcelId/cancel Change the status of a specific parcel delivery order..
+ * @api {patch} /api/v1/parcels/:parcelId/status Change the status of a specific parcel delivery order
  * @apiGroup Parcel
  * @apiHeader {String} Authorisation Token of authenticated user
  * @apiHeaderExample {json}  Header
@@ -645,7 +651,7 @@ app.patch('/api/v1/parcels/:parcelId/status', authController.verifyToken, (req, 
 });
 
 /**
- * @api {patch} /api/v1/parcels/:parcelId/cancel Change the present location of a specific parcel delivery order.
+ * @api {patch} /api/v1/parcels/:parcelId/currentLocation Change the present location of a specific parcel delivery order.
  * @apiGroup Parcel
  * @apiHeader {String} Authorisation Token of authenticated user
  * @apiHeaderExample {json}  Header
@@ -696,7 +702,7 @@ app.patch('/api/v1/parcels/:parcelId/currentLocation', authController.verifyToke
 
 
 /**
- * @api {delete} /api/v1/parcel/:parcelId Deletes a parcel order
+ * @api {delete} /api/v1/parcels/:parcelId Deletes a parcel order
  * @apiGroup Parcel
  * @apiHeader {String} Authorisation Token of authenticated user
  * @apiHeaderExample {json}  Header
