@@ -194,7 +194,7 @@ const parcelController = {
       if (!rows[0]) {
         return res.status(404).json({ status: res.statusCode, message: 'There is no parcel for this user' });
       }
-      console.log('Rows: ', rows);
+
       return res.status(200).json({ status: res.statusCode, data: rows, maessage: `Number of active Parcel orders created by this user: ${rowCount}` });
     } catch (error) {
       return res.status(412).json({ status: res.statusCode, error: error.message });
@@ -250,8 +250,7 @@ const parcelController = {
           console.log(`Email sent: ${info.response}`);
         }
       });
-      console.log('Sender: ', process.env.EMAIL);
-      console.log('Recipient: ', result.rows[0].email);
+
 
       return res.status(200).json({
         status: res.statusCode,
@@ -308,8 +307,7 @@ const parcelController = {
           console.log(`Email sent: ${info.response}`);
         }
       });
-      console.log('Sender: ', process.env.EMAIL);
-      console.log('Recipient: ', result.rows[0].email);
+
 
       return res.status(200).json({
         status: res.statusCode,
