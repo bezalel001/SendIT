@@ -7,6 +7,7 @@ dotenv.config(); // find and expose environment variables
 // connect to database
 const pool = new Pool({
   connectionString: process.env.NODE_ENV === 'test' ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL,
+  ssl: true,
 });
 
 // A custom query function
