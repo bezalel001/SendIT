@@ -182,7 +182,7 @@ const parcelController = {
   // Fetch all parcel delivery order by a specific user.
   async getParcelsBySpecificUser(req, res) {
     // confirm that the logged in user created the parcel orders
-    if (!req.user.isAdmin || req.params.userId !== req.user.userId) {
+    if (!req.user.isAdmin || parseInt(req.params.userId, 10) !== parseInt(req.user.userId, 10)) {
       return res.status(403).json({ status: res.statusCode, message: 'Unauthorized access' });
     }
     const queryText = 'SELECT * FROM parcel_order WHERE placed_by = $1';
@@ -194,6 +194,7 @@ const parcelController = {
       if (!rows[0]) {
         return res.status(404).json({ status: res.statusCode, message: 'There is no parcel for this user' });
       }
+      console.log('Rows: ', rows);
       return res.status(200).json({ status: res.statusCode, data: rows, maessage: `Number of active Parcel orders created by this user: ${rowCount}` });
     } catch (error) {
       return res.status(412).json({ status: res.statusCode, error: error.message });
