@@ -7,8 +7,7 @@
     "test": "mocha test/**/*.js || true",
     "start": "node server.js --exec babel-node --presets env",
     "build": "babel server.js --out-dir build",
-    "apidoc": "apidoc -f server.js -o public/apidoc",
-    "postinstall": "bower install && grunt build"
+    "apidoc": "apidoc -f server.js -o public/apidoc"
   },
   "apidoc": {
     "name": "SendIT API - Documentation",
