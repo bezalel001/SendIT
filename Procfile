@@ -1,1 +1,1 @@
-web: node server.js --exec babel-node --presets env
+web: node boot.js
