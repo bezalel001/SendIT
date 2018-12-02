@@ -51,6 +51,7 @@ const createParcelTable = () => {
   CREATE TABLE IF NOT EXISTS 
   parcel_order(
       parcel_id serial PRIMARY KEY,
+      parcel_title VARCHAR (255),
       placed_by INTEGER NOT NULL,
       weight REAL,
       weight_metric VARCHAR (32),      
