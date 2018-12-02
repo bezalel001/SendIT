@@ -29,7 +29,7 @@ const userController = {
   // Get a specific
   async getUser(req, res) {
     // authenticated user must own the data or must be admin
-    if (req.user.userId !== req.params.userId || !req.user.isAdmin) {
+    if (parseInt(req.user.userId, 10) !== parseInt(req.params.userId, 10) || !req.user.isAdmin) {
       return res.status(403).json({ status: res.statusCode, message: 'Access not allowed!' });
     }
 

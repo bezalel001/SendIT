@@ -34,12 +34,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var app = (0, _express2.default)();
 app.set('json spaces', 4);
+<<<<<<< HEAD
 
 // app.use(express.static('public'));
+=======
+>>>>>>> dev
 app.use(_bodyParser2.default.json());
 app.use(_bodyParser2.default.urlencoded({ extended: true }));
 app.use((0, _cors2.default)());
 
+<<<<<<< HEAD
+=======
+app.use(_express2.default.static('public'));
+
+>>>>>>> dev
 var PORT = process.env.PORT || 3000;
 
 /**

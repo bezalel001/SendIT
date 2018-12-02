@@ -5,9 +5,10 @@
   "main": "server.js",
   "scripts": {
     "test": "mocha test/**/*.js || true",
-    "start": "nodemon server.js --exec babel-node --presets env",
+    "start": "node server.js --exec babel-node --presets env",
     "build": "babel server.js --out-dir build",
-    "apidoc": "apidoc -f server.js -o public/apidoc"
+    "apidoc": "apidoc -f server.js -o public/apidoc",
+    "postinstall": "bower install && grunt build"
   },
   "apidoc": {
     "name": "SendIT API - Documentation",
@@ -18,6 +19,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bezalel001/SendIT.git"
+  },
+  "engines": {
+    "node": "10.11.0"
   },
   "keywords": [
     "node",
@@ -44,6 +48,7 @@
     "eslint-plugin-import": "^2.14.0",
     "make-runnable": "^1.3.6",
     "mocha": "^5.2.0",
+    "nodemon": "^1.18.6",
     "supertest": "^3.3.0"
   },
   "dependencies": {
